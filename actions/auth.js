@@ -23,9 +23,16 @@ import {
   LOGOUT_SUCCESS,
   LOGOUT_FAIL,
 
+  // プロフィール編集
+  EDIT_PROFILE_SUCCESS,
+  EDIT_PROFILE_FAIL,
+
   // 読み込み中
   SET_AUTH_LOADING,
   REMOVE_AUTH_LOADING,
+
+  // 状態解除
+  RESET_AUTH_STATUS,
 } from './types'
 
 // ユーザー登録
@@ -53,6 +60,7 @@ export const register = (name, email, password) => async (dispatch) => {
       dispatch({
         type: REGISTER_SUCCESS,
       })
+      await dispatch(login(email, password))
     } else {
       dispatch({
         type: REGISTER_FAIL,
@@ -236,5 +244,59 @@ export const logout = () => async (dispatch) => {
 
   dispatch({
     type: REMOVE_AUTH_LOADING,
+  })
+}
+
+// プロフィール編集
+export const edit_profile = (id, name, image) => async (dispatch) => {
+  dispatch({
+    type: SET_AUTH_LOADING,
+  })
+
+  const formData = new FormData()
+  formData.append('name', name)
+  if (image) {
+    formData.append('image', image)
+  }
+
+  try {
+    const res = await fetch('/api/post/edit_post', {
+      method: 'GET',
+    })
+    const data = await res.json()
+
+    const res2 = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/users/${id}/`, {
+      method: 'PATCH',
+      headers: {
+        Authorization: `Bearer ${data.access}`,
+      },
+      body: formData,
+    })
+
+    if (res2.status === 200) {
+      dispatch({
+        type: EDIT_PROFILE_SUCCESS,
+      })
+      await dispatch(user())
+    } else {
+      dispatch({
+        type: EDIT_PROFILE_FAIL,
+      })
+    }
+  } catch (err) {
+    dispatch({
+      type: EDIT_PROFILE_FAIL,
+    })
+  }
+
+  dispatch({
+    type: REMOVE_AUTH_LOADING,
+  })
+}
+
+// 状態解除
+export const reset_auth_status = () => (dispatch) => {
+  dispatch({
+    type: RESET_AUTH_STATUS,
   })
 }

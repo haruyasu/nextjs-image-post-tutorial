@@ -23,15 +23,23 @@ import {
   LOGOUT_SUCCESS,
   LOGOUT_FAIL,
 
+  // プロフィール編集
+  EDIT_PROFILE_SUCCESS,
+  EDIT_PROFILE_FAIL,
+
   // 読み込み中
   SET_AUTH_LOADING,
   REMOVE_AUTH_LOADING,
+
+  // 状態解除
+  RESET_AUTH_STATUS,
 } from '../actions/types'
 
 const initialState = {
   user: null,
   isAuthenticated: null,
   loading: false,
+  edit_profile_success: false,
 }
 
 const authReducer = (state = initialState, action) => {
@@ -108,6 +116,17 @@ const authReducer = (state = initialState, action) => {
       return {
         ...state,
       }
+    
+    // プロフィール編集
+    case EDIT_PROFILE_SUCCESS:
+      return {
+        ...state,
+        edit_profile_success: true,
+      }
+    case EDIT_PROFILE_FAIL:
+      return {
+        ...state,
+      }
 
     // 読み込み中
     case SET_AUTH_LOADING:
@@ -119,6 +138,13 @@ const authReducer = (state = initialState, action) => {
       return {
         ...state,
         loading: false,
+      }
+    
+    // 状態解除
+    case RESET_AUTH_STATUS:
+      return {
+        ...state,
+        edit_profile_success: false,
       }
     default:
       return state
